@@ -1,4 +1,4 @@
-export default  {
+const config =  {
     MONGO_HOST: process.env.MONGO_HOST || "localhost",
     MONGO_PORT: process.env.MONGO_PORT || 12721,
     S3_HOST : process.env.S3_HOST || "localhost",
@@ -9,3 +9,5 @@ export default  {
     CONTAINER_DEV_CUSTOM_PORT: 5943
 
 }
+
+module.exports = config

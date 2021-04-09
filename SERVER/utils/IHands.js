@@ -1,6 +1,4 @@
-export default class IHands {
-    _endPointBase;
-    _port;
+class IHands {
 
     constructor(port) {
         this._port = port;
@@ -81,5 +79,7 @@ export default class IHands {
             })
     }
 }
+
+module.exports = IHands;
 
 

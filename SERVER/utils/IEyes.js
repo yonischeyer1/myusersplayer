@@ -1,6 +1,5 @@
-export default class IEyes {
-    _endPointBase;
-    _port;
+class IEyes {
+
 
     constructor(port) {
         this._port = port;
@@ -38,5 +37,8 @@ export default class IEyes {
           })
     }
 }
+
+
+module.exports = IEyes;
 
 

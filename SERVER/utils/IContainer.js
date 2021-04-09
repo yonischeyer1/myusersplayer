@@ -1,5 +1,5 @@
 
-import { runContainerCMD } from "./IHost";
+const { runContainerCMD } = require("./IHost");
 
  async function startVnc(containerId, rfbport, processName)  {
     const command = `x11vnc -rfbport 5945 -passwd TestVNC -display :1 -N -forever &  export DISPLAY=:1 `
@@ -24,7 +24,7 @@ import { runContainerCMD } from "./IHost";
 }
 
 
-export async function getPidByName(containerId, processName) {
+ async function getPidByName(containerId, processName) {
     const command_to_exec = `pidof ${processName}`
     const response = await runContainerCMD(containerId, command_to_exec);
     return response;

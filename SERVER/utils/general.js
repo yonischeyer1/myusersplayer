@@ -9,8 +9,6 @@ const CWD = process.cwd();
 const APP_CWD = isWindows() ? `${CWD}\\` : `${CWD}/` ;
 
 class ExtractFrames extends Transform {
-    delimiter;
-    buffer;
     constructor(delimiter) {
       super({ readableObjectMode: true })
       this.delimiter = Buffer.from(delimiter, "hex")
@@ -36,4 +34,9 @@ class ExtractFrames extends Transform {
     }
   }
 
-module.exports = {APP_CWD, isWindows, ExtractFrames}
+
+ function getRandomArbitrary(min, max) {
+    return Math.ceil(Math.random() * (max - min) + min);
+ }
+
+module.exports = {APP_CWD, isWindows, ExtractFrames, getRandomArbitrary}

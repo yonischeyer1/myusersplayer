@@ -1,6 +1,6 @@
-import { APP_CWD, isWindows, getRandomArbitrary, ExtractFrames } from "./general";
+const { APP_CWD, isWindows, getRandomArbitrary, ExtractFrames }  = require( "./general");
 const { spawn } = require("child_process");
-import config from '../config'
+const config = require('../config')
 
  function runLocalCMD(cmd, condToReturn, onExit, onData) {
     try {
@@ -105,4 +105,11 @@ import config from '../config'
     return;
 }
 
-module.exports = {genaratePortNumber, runDockerImage, getDockerContainerIdByName, copyFileToContainer, removeContainerByName}
+async function runContainerCMD(containerId ,containerCMD, condToReturn, onExit, ownQuots, onData) {
+    const containerCMDNew = ownQuots ? containerCMD : `"${containerCMD}"`
+    const command = `docker exec -i ${containerId} /bin/bash -c ${containerCMDNew}`;
+    const response = await runLocalCMD(command, condToReturn, onExit, onData);
+    return response;
+}
+
+module.exports = {genaratePortNumber, runDockerImage, getDockerContainerIdByName, copyFileToContainer, removeContainerByName, runContainerCMD}

@@ -1,3 +1,5 @@
 node_modules
 *.jar
 *.zip
+output 
+sessions

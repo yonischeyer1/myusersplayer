@@ -1,9 +1,9 @@
-import { genaratePortNumber, runDockerImage, getDockerContainerIdByName, copyFileToContainer, removeContainerByName } from "../utils/IHost";
-import { startChormium, startVnc, startHandsSparkServer } from "../utils/IContainer";
-import IHands from "../utils/Ihands";
-import IEyes from "../utils/IEyes";
-import { APP_CWD } from "../utils/general";
-export const IMAGE_NAME = 'ioroboto'
+const { genaratePortNumber, runDockerImage, getDockerContainerIdByName, copyFileToContainer, removeContainerByName } = require("../utils/IHost");
+const { startChormium, startVnc, startHandsSparkServer } = require("../utils/IContainer");
+const IHands = require( "../utils/Ihands");
+const IEyes = require( "../utils/IEyes");
+const { APP_CWD } = require( "../utils/general");
+const IMAGE_NAME = 'ioroboto'
 
 class Container {
     constructor() {
@@ -33,32 +33,41 @@ class Container {
        this.loadingFunction = null
     }
     async init(startUrl = null, userId = null) {
-        try {
-            let containerName;
-            this._containerServicesPorts.vnc = await genaratePortNumber();
-            this._containerServicesPorts.hands = await genaratePortNumber();
-            this._containerServicesPorts.eyes = await genaratePortNumber();
-            this._containerServicesPorts.devCustom = await genaratePortNumber();
-            containerName = `${IMAGE_NAME}${this._mode}${this._containerServicesPorts.vnc}`
+    return new Promise((resolve,reject)=>{
+        (async()=>{
+            try {
+                let containerName;
 
-            await runDockerImage(this._containerServicesPorts, containerName, IMAGE_NAME); 
-
-            let containerId = (await getDockerContainerIdByName(containerName)).toString().replace(/[^a-zA-Z0-9]/g, ''); //remove spiceal chars from id
-            this.setState(this._containerServicesPorts.vnc, containerId, containerName)
-
-            this._ihands = new IHands(this._containerServicesPorts.hands);
-            this._ieyes = new IEyes(this._containerServicesPorts.eyes);
-            
-            const userSessionFolderPath = `${APP_CWD}sessions/${userId}`
-            await copyFileToContainer(this._containerId, userSessionFolderPath)
-            const browserPid = await startChormium(this._containerId, this._containerProcess.browser.name, startUrl, userId);
-            this._containerProcess.browser.pid = browserPid;
-            const vncPid = await startVnc(this._containerId, this._port,this._containerProcess.vnc.name);
-            this._containerProcess.vnc.pid = vncPid;
-
-        } catch(err) {
-
-        }
+                console.log("init container")
+                this._containerServicesPorts.vnc = await genaratePortNumber();
+                this._containerServicesPorts.hands = await genaratePortNumber();
+                this._containerServicesPorts.eyes = await genaratePortNumber();
+                this._containerServicesPorts.devCustom = await genaratePortNumber();
+                console.log("genrated port numbers")
+                containerName = `${IMAGE_NAME}${this._containerServicesPorts.vnc}`
+                console.log("containerName",containerName)
+                await runDockerImage(this._containerServicesPorts, containerName, IMAGE_NAME); 
+    
+                console.log("after runDockerImage")
+                let containerId = (await getDockerContainerIdByName(containerName)).toString().replace(/[^a-zA-Z0-9]/g, ''); //remove spiceal chars from id
+                this.setState(this._containerServicesPorts.vnc, containerId, containerName)
+    
+                this._ihands = new IHands(this._containerServicesPorts.hands);
+                this._ieyes = new IEyes(this._containerServicesPorts.eyes);
+                
+                const userSessionFolderPath = `${APP_CWD}sessions/${userId}`
+                await copyFileToContainer(this._containerId, userSessionFolderPath)
+                const browserPid = await startChormium(this._containerId, this._containerProcess.browser.name, startUrl, userId);
+                this._containerProcess.browser.pid = browserPid;
+                const vncPid = await startVnc(this._containerId, this._port,this._containerProcess.vnc.name);
+                this._containerProcess.vnc.pid = vncPid;
+                resolve();
+    
+            } catch(err) {
+    
+            }
+        })()
+    })
     }
     setState(port, containerId, containerName) {
         this._containerId = containerId;
