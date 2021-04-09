@@ -16,8 +16,9 @@ app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit:500
 app.use(cors());
 app.post('/sendEmail', (req, res) => {
     (async()=>{
-        await playTestSuite();
-        res.send('Hello World!')
+        const resp = await playTestSuite();
+        console.log("resp",resp)
+        res.send(resp)
     })()
 })
 

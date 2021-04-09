@@ -9,7 +9,7 @@ const { runContainerCMD } = require("./IHost");
 }
 
  async function startChormium(containerId, processName, startUrl, userName = "users3")  {
-    const command = `Xvfb :1 -screen 0 1024x768x24 </dev/null & export DISPLAY=:1 && chromium ${startUrl} --user-data-dir=${userName} --window-size=1024,768 --no-sandbox --disable-extensions --disable-translate &  export DISPLAY=:1`
+    const command = `Xvfb :1 -screen 0 1024x768x24 </dev/null & export DISPLAY=:1 && chromium --new-window --disable-search-geolocation-disclosure --aggressive-cache-discard --disable-notifications --disable-remote-fonts --disable-reading-from-canvas --disable-remote-playback-api --disable-shared-workers --disable-voice-input --enable-aggressive-domstorage-flushing ${startUrl} --user-data-dir=${userName} --window-size=1024,768  --no-sandbox --disable-extensions --disable-translate &  export DISPLAY=:1`
     const response = await runContainerCMD(containerId, command, null, true);
     console.log("startChormium response",response)
     const pid = await getPidByName(containerId, processName);

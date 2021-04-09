@@ -18,7 +18,7 @@ class Container {
        this.containerId = ''
        this.port = 0
        this.containerName = ''
-       this.containerProcess = {
+       this._containerProcess = {
            vnc:{name:'x11vnc', pid:null},
            video:{name:'ffmpeg', pid:null},
            browser:{name:'chromium', pid:null},

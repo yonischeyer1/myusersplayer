@@ -1,3 +1,4 @@
+const fetch = require('node-fetch')
 class IHands {
 
     constructor(port) {
