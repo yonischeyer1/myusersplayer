@@ -1,12 +1,12 @@
 export default class IEyes {
-    _endPointBase:string;
-    _port:number;
+    _endPointBase;
+    _port;
 
-    constructor(port:number) {
+    constructor(port) {
         this._port = port;
         this._endPointBase = `http://localhost:${port}`;
     }
-    async playAction(action:any) {
+    async playAction(action) {
       const endpoint = `${this._endPointBase}/playAction`
       return fetch(endpoint, {
             method: 'POST', 
@@ -22,7 +22,7 @@ export default class IEyes {
           })
     }
 
-    async playRecorderAction(action:any) {
+    async playRecorderAction(action) {
       const endpoint = `${this._endPointBase}/playRecorderAction`
       return fetch(endpoint, {
             method: 'POST', 

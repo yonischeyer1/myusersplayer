@@ -5,18 +5,18 @@ import IEyes from "../utils/IEyes";
 import { APP_CWD } from "../utils/general";
 import fs from 'fs'
 export const IMAGE_NAME = 'ioroboto'
-let instance:any = null;
+let instance = null;
 export const CONTAINER_MODE = {
     player:'player',
     recorder:'recorder',
     login:'login'
 }
 export default class Container {
-     _userId:null;
-     autoTaggerData: null;
-    _startRecordTimeStamp:null;
-    _ihands :IHands | undefined;
-    _ieyes :IEyes | undefined;
+     _userId
+     autoTaggerData
+    _startRecordTimeStamp
+    _ihands
+    _ieyes 
     _ioActions = []
     _startUrl = ""
     _mode = 'player'
@@ -35,8 +35,8 @@ export default class Container {
         eyes:0,
         devCustom:0
     }
-    loadingFunction:any = null
-    constructor(mode:string) {
+    loadingFunction = null
+    constructor(mode) {
         if(!instance && mode === CONTAINER_MODE.recorder){
             instance = this;
             this._mode = mode;
@@ -54,7 +54,7 @@ export default class Container {
             }
         }
     }
-    async init(startUrl:any = null, userId:any = null) {
+    async init(startUrl = null, userId = null) {
         try {
             if(this._mode === CONTAINER_MODE.login) {
                 this._containerServicesPorts.vnc = await genaratePortNumber();  
@@ -90,13 +90,13 @@ export default class Container {
 
         }
     }
-    setState(port:number, containerId: string, containerName:string) {
+    setState(port, containerId, containerName) {
         this._containerId = containerId;
         this._containerName = containerName;
         this._port = port;
     }
 
-    async record(startUrl:string, userId:any = null) {
+    async record(startUrl, userId = null) {
         return new Promise((resolve, reject)=>{
             (async()=>{
                 this._userId = userId; 
@@ -125,7 +125,7 @@ export default class Container {
         })
     }
 
-    async login(startUrl:any, userId:any = null) {
+    async login(startUrl, userId = null) {
         //https://accounts.google.com/signin/v2/identifier
         await this.loadingFunction(true);
         if(userId) {
@@ -140,7 +140,7 @@ export default class Container {
         await this.loadingFunction(false);
     }
 
-    async finishLogin(userId:any) {
+    async finishLogin(userId) {
         await this.loadingFunction(true);
         const userSessionFolderPath = `sessions/${userId}`
         await removeUserSessionFolder(`${APP_CWD}sessions/${userId}`.trim());
@@ -157,7 +157,7 @@ export default class Container {
         return;
     }
 
-    async stopRecording(startUrl:any) {
+    async stopRecording(startUrl) {
         await this.loadingFunction(true);
         await stopContainerProcess(this._containerId ,this._containerProcess.vnc.pid)
         const ioActions = await (await this._ihands.stopRecordingKeyboardMouseAndGetIoActions()).json();
@@ -171,7 +171,7 @@ export default class Container {
         await this.loadingFunction(false);
     }
 
-    async play(noLivePreview:boolean = true, action:any) {
+    async play(noLivePreview = true, action) {
         return new Promise((resolve, reject)=>{
             (async()=>{
                 if(this._mode === CONTAINER_MODE.recorder) { 
@@ -215,7 +215,7 @@ export default class Container {
         })
     //     return;
     }
-    async playRecorderAction(action:any, callbackStartedBrowser:any) {
+    async playRecorderAction(action, callbackStartedBrowser) {
         await removeFileFromContainer(this._containerId, `${this._userId}`)
         const userSessionFolderPath = `${APP_CWD}sessions/${this._userId}`
         await copyFileToContainer(this._containerId, userSessionFolderPath)

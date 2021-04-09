@@ -1,8 +1,8 @@
 export default class IHands {
-    _endPointBase:string;
-    _port:number;
+    _endPointBase;
+    _port;
 
-    constructor(port:number) {
+    constructor(port) {
         this._port = port;
         this._endPointBase = `http://localhost:${port}`;
     }
@@ -35,7 +35,7 @@ export default class IHands {
               referrerPolicy: 'no-referrer', 
             })
     }
-    async startRecorderPlayerKeyboardMouse(ioActions:any) {
+    async startRecorderPlayerKeyboardMouse(ioActions) {
         const endpoint = `${this._endPointBase}/record/player/start`
         return fetch(endpoint, {
               method: 'POST', 
@@ -50,7 +50,7 @@ export default class IHands {
               body: JSON.stringify(ioActions)
             })
     }
-    async startPlayerKeyboardMouse(ioActions:any) {
+    async startPlayerKeyboardMouse(ioActions) {
         const endpoint = `${this._endPointBase}/player/start`
         return fetch(endpoint, {
               method: 'POST', 

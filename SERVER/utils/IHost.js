@@ -3,18 +3,18 @@ import { IMAGE_NAME } from "../services /container.service";
 const { spawn } = require("child_process");
 import config from '../config'
 
-export function runLocalCMD(cmd:string, condToReturn?:any, onExit?:boolean, onData?:any) {
+export function runLocalCMD(cmd, condToReturn, onExit, onData) {
     try {
         return new Promise((resolve, reject)=>{
                 console.log("cmd", cmd)
                 const someCMD = spawn(cmd, { shell: true})
                 if(!onExit) {
                     if(typeof onData === "function") {
-                        someCMD.stdout.pipe(new ExtractFrames("FFD8FF")).on("data", async (data: any) => {
+                        someCMD.stdout.pipe(new ExtractFrames("FFD8FF")).on("data", async (data) => {
                             onData(data);
                         })
                     } else {
-                        someCMD.stdout.on("data", async (data: any) => {
+                        someCMD.stdout.on("data", async (data) => {
                             data = data.toString()
                             console.log("data",data)
                             if(typeof condToReturn !== "function") {
@@ -28,7 +28,7 @@ export function runLocalCMD(cmd:string, condToReturn?:any, onExit?:boolean, onDa
                             }
                         })
                     }
-                    someCMD.stderr.on("data", (err: any) => {
+                    someCMD.stderr.on("data", (err) => {
                         console.log(`someCMD.stderr ${err.toString()}`)
                         if(typeof onData !== "function"){
                             someCMD.kill()
@@ -36,7 +36,7 @@ export function runLocalCMD(cmd:string, condToReturn?:any, onExit?:boolean, onDa
                         }
                     })
                 } 
-                someCMD.on("exit", (data:any) => {
+                someCMD.on("exit", (data) => {
                     if(data) {
                         data = data.toString()
                     }
@@ -52,29 +52,29 @@ export function runLocalCMD(cmd:string, condToReturn?:any, onExit?:boolean, onDa
 
 
 //"docker exec 2ca4b0903e48 bash -c 'export DISPLAY=:1 && java -jar iocore.jar"
-export async function runContainerCMD(containerId:string ,containerCMD: string, condToReturn?:any, onExit?:boolean,ownQuots?:boolean, onData?:any) : Promise<any> {
+export async function runContainerCMD(containerId ,containerCMD, condToReturn, onExit, ownQuots, onData)  {
     const containerCMDNew = ownQuots ? containerCMD : `"${containerCMD}"`
     const command = `docker exec -i ${containerId} /bin/bash -c ${containerCMDNew}`;
     const response = await runLocalCMD(command, condToReturn, onExit, onData);
     return response;
 }
 
-export async function buildDockerImage(imageName:string) {
+export async function buildDockerImage(imageName) {
  let cmd = ''
  if(isWindows()) {
      cmd = `cd ${APP_DOCKER_META_PATH} && docker build --rm -t ${imageName} .`
  } else {
      cmd = `docker build --rm -t ${IMAGE_NAME} ${APP_DOCKER_META_PATH}`
  }
- const response = await runLocalCMD(cmd,(data: string)=>{
+ const response = await runLocalCMD(cmd,(data)=>{
      return data.indexOf("Successfully tagged") > -1;
  },false);
  return response;
 }
 
-export async function isDockerImageBuilt(imageName: string) {
+export async function isDockerImageBuilt(imageName) {
     const cmd = `docker inspect --type=image ${imageName}`;
-    let response:any = await runLocalCMD(cmd);
+    let response = await runLocalCMD(cmd);
     if(response.err) {
         return false;
     }
@@ -82,31 +82,31 @@ export async function isDockerImageBuilt(imageName: string) {
     return response.length > 0
 }
 
-export async function runDockerImage(ports:any, containerName:string ,imageName: string, devPort?:any) {
+export async function runDockerImage(ports, containerName ,imageName, devPort) {
     const cmd = `docker run --log-driver none --shm-size=1g --name ${containerName} -d -p ${ports.vnc}:${config.CONTAINER_VNC_PORT} -p ${ports.hands}:${config.CONTAINER_IOCORE_PORT} -p ${ports.eyes}:${config.CONTAINER_VIDEO_ANALYZER_PORT} -p ${ports.devCustom}:${config.CONTAINER_DEV_CUSTOM_PORT} ${imageName} `
     const response = await runLocalCMD(cmd);
     return response;
 }
 
-export async function copyFileFromContainer(containerId:string, containerFileName:string, newFileName?:string) {
+export async function copyFileFromContainer(containerId, containerFileName, newFileName) {
     const cotainerIoFilePath = `${containerId}:/usr/src/app/${containerFileName}`
     const outputIoFilePathInHostMachine = newFileName ? `${APP_CWD}${newFileName}` : APP_CWD;
     const command = isWindows() ? `${APP_CWD}\\dockerMeta\\pollIoFile.bat ${cotainerIoFilePath} ${outputIoFilePathInHostMachine}` : `${APP_CWD}/dockerMeta/pollIoFile.sh ${cotainerIoFilePath} ${outputIoFilePathInHostMachine}`
-    const response = await runLocalCMD(command, (response: string) => {
+    const response = await runLocalCMD(command, (response) => {
         return response.indexOf("waited") === -1 && response.indexOf(containerId) === -1
     });
 }
 
-export async function copyFileToContainer(containerId:string, fileLocalOSPath:string) {
+export async function copyFileToContainer(containerId, fileLocalOSPath) {
     const cotainerIoFilePath = `${containerId}:/usr/src/app`
     const outputIoFilePathInHostMachine = fileLocalOSPath;
     const command = isWindows() ? `${APP_CWD}\\dockerMeta\\pollIoFile.bat ${outputIoFilePathInHostMachine} ${cotainerIoFilePath}` : `${APP_CWD}/dockerMeta/pollIoFile.sh ${outputIoFilePathInHostMachine} ${cotainerIoFilePath}`
-    const response = await runLocalCMD(command, (response: string) => {
+    const response = await runLocalCMD(command, (response) => {
         return response.indexOf("waited") === -1 && response.indexOf(containerId) === -1
     });
 }
 
-export async function removeContainerByName(containerName:any) {
+export async function removeContainerByName(containerName) {
     const command = `docker rm -f ${containerName}`
     await runLocalCMD(command);
     const command2 = " docker system prune -a --volumes --filter label=repo=ioroboto --filter label=repo=amd64/debian -f"
@@ -115,38 +115,38 @@ export async function removeContainerByName(containerName:any) {
 }
 
 
-export async function killContainer(imageName:string) {
+export async function killContainer(imageName) {
     const command = `docker rm -vf $(docker ps -a -q --filter ancestor=${imageName} | tr '\n' ' ')`;
     const response = await runLocalCMD(command);
     return response;
 }
 
-export async function removeImage(imageName:string) {
+export async function removeImage(imageName) {
     const command = `docker rmi ${imageName}`;
     const response = await runLocalCMD(command);
     return response;
 }
 
-export async function getFullContainerName(containerName:string) :Promise<any> {
+export async function getFullContainerName(containerName) {
     const command = `docker ps --format "{{.Names}}" -f "name=${containerName}"`;
     const response = await runLocalCMD(command, null, false);
     return response;
 }
 
 
-export async function getDockerImageId(imageName: string) {
+export async function getDockerImageId(imageName) {
     const command = `docker ps -a -q  --filter ancestor=${imageName}`;
     const response = await runLocalCMD(command);
     return response;
 }
 
-export async function getDockerContainerIdByName(containerName: string) {
+export async function getDockerContainerIdByName(containerName) {
     const command = `docker ps -aqf "name=${containerName}"`;
     const response = await runLocalCMD(command);
     return response;
 }
 
-export async function copyLocalIoFile(ioFilePath: string) {
+export async function copyLocalIoFile(ioFilePath) {
     const command = isWindows() ? `copy "${ioFilePath}" "${APP_CWD}\\dockerMeta"` : `cp ${ioFilePath} ${APP_CWD}/dockerMeta`;
     const response = await runLocalCMD(command);
     return response;
@@ -155,9 +155,9 @@ export async function copyLocalIoFile(ioFilePath: string) {
 
 
 
-export async function isPortUsed(port:any) {
+export async function isPortUsed(port) {
     const command = isWindows() ? `netstat -ano | findStr "${port}" `  : `lsof -Pi :${port} -sTCP:LISTEN -t`;
-    const response:any = await runLocalCMD(command);
+    const response = await runLocalCMD(command);
     return response['exit'] ? false : true;
 }
 
@@ -174,7 +174,7 @@ export async function genaratePortNumber() {
     }
 }
 
-export async function removeUserSessionFolder(userSessionFolderPath:any) {
+export async function removeUserSessionFolder(userSessionFolderPath) {
     const cmd = `rm -rf ${userSessionFolderPath}`;
     await runLocalCMD(cmd);
     return;
