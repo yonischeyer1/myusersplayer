@@ -1,5 +1,5 @@
 async function playTestSuite (testSuite)  { 
-    //decompress file and 
+    //decompress file and play testSuite.json file
     for(const test of testSuite.suite) {
        await this.playTest(test)
        testIdx++;

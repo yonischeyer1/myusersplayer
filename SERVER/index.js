@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const { playTestSuite } = require('./player');
 
 const config = {
     name: 'ioroboto-player-server',
@@ -14,8 +15,10 @@ app.use(bodyParser.json({limit: "50mb"}));
 app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit:50000}));
 app.use(cors());
 app.post('/sendEmail', (req, res) => {
-    //PlayTestFile
-    res.send('Hello World!')
+    (async()=>{
+        await playTestSuite();
+        res.send('Hello World!')
+    })()
 })
 
 
