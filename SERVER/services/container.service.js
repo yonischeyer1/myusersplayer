@@ -1,11 +1,11 @@
-import { genaratePortNumber, runDockerImage, getDockerContainerIdByName, copyFileToContainer, copyFileFromContainer, removeContainerByName } from "../utils/IHost";
-import { startVideoRecording, startChormium, startVnc, convertVideoFile, removeFileFromContainer, stopContainerProcess, startHandsSparkServer } from "../utils/IContainer";
+import { genaratePortNumber, runDockerImage, getDockerContainerIdByName, copyFileToContainer, removeContainerByName } from "../utils/IHost";
+import { startChormium, startVnc, startHandsSparkServer } from "../utils/IContainer";
 import IHands from "../utils/Ihands";
 import IEyes from "../utils/IEyes";
 import { APP_CWD } from "../utils/general";
 export const IMAGE_NAME = 'ioroboto'
 
-export default class Container {
+class Container {
     constructor() {
        this._userId = null
        this.autoTaggerData = null
@@ -34,18 +34,21 @@ export default class Container {
     }
     async init(startUrl = null, userId = null) {
         try {
-            let port, containerName;
+            let containerName;
             this._containerServicesPorts.vnc = await genaratePortNumber();
             this._containerServicesPorts.hands = await genaratePortNumber();
             this._containerServicesPorts.eyes = await genaratePortNumber();
             this._containerServicesPorts.devCustom = await genaratePortNumber();
-            console.log("  this._containerServicesPorts",  this._containerServicesPorts)
             containerName = `${IMAGE_NAME}${this._mode}${this._containerServicesPorts.vnc}`
+
             await runDockerImage(this._containerServicesPorts, containerName, IMAGE_NAME); 
+
             let containerId = (await getDockerContainerIdByName(containerName)).toString().replace(/[^a-zA-Z0-9]/g, ''); //remove spiceal chars from id
             this.setState(this._containerServicesPorts.vnc, containerId, containerName)
+
             this._ihands = new IHands(this._containerServicesPorts.hands);
             this._ieyes = new IEyes(this._containerServicesPorts.eyes);
+            
             const userSessionFolderPath = `${APP_CWD}sessions/${userId}`
             await copyFileToContainer(this._containerId, userSessionFolderPath)
             const browserPid = await startChormium(this._containerId, this._containerProcess.browser.name, startUrl, userId);
@@ -84,5 +87,7 @@ export default class Container {
         this._containerProcess.vnc.pid = vncPid;
     }
 }
+
+module.exports = {Container}
 
 
