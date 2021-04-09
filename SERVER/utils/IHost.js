@@ -1,4 +1,4 @@
-import { APP_CWD, isWindows, getRandomArbitrary, APP_DOCKER_META_PATH, ExtractFrames } from "./general";
+import { APP_CWD, isWindows, getRandomArbitrary, ExtractFrames } from "./general";
 const { spawn } = require("child_process");
 import config from '../config'
 

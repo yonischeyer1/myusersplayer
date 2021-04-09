@@ -1,9 +1,13 @@
-async function playTestSuite (testSuite, testSuiteIdx)  { 
-    //await this.disableUserActionsDropDown(testSuite, true);
-    let testIdx = 0;
+async function playTestSuite (testSuite)  { 
     for(const test of testSuite.suite) {
-       await this.playTest(test, testSuite.id, testIdx, testSuiteIdx)
+       await this.playTest(test)
        testIdx++;
     }
-    //await this.disableUserActionsDropDown(testSuite, false);
+}
+
+async function playTest (test, testSuiteId) {
+    const playingContainerInstance = new Container();
+    await playingContainerInstance.init(test.action.startUrl, test.userId);
+    const testResp = await (await playingContainerInstance.play(true, test.action)).json()
+    return testResp.success;
 }
